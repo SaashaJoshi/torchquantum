@@ -23,6 +23,7 @@ SOFTWARE.
 """
 
 import copy
+import os
 from typing import Dict, Iterable, List, TYPE_CHECKING
 
 import numpy as np
@@ -749,12 +750,14 @@ def get_provider(backend_name, hub=None):
         Returns:
             IBMQProvider: The provider object.
         """
+    # Get token from GitHub Actions environment.
+    token = os.getenv("IBM_API_TOKEN")
     # mass-inst-tech-1 or MIT-1
     if backend_name in ["ibmq_casablanca", "ibmq_rome", "ibmq_bogota", "ibmq_jakarta"]:
         if hub == "mass" or hub is None:
-            provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q-research/mass-inst-tech-1/main")
+            provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q-research/mass-inst-tech-1/main")
         elif hub == "mit":
-            provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q-research/MIT-1/main")
+            provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q-research/MIT-1/main")
         else:
             raise ValueError(f"not supported backend {backend_name} in hub " f"{hub}")
     elif backend_name in [
@@ -764,25 +767,27 @@ def get_provider(backend_name, hub=None):
         "ibmq_guadalupe",
         "ibmq_montreal",
     ]:
-        provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q-ornl/anl/csc428")
+        provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q-ornl/anl/csc428")
     else:
         if hub == "mass" or hub is None:
             try:
-                provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q-research/mass-inst-tech-1/main")
+                provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q-research/mass-inst-tech-1/main")
             except QiskitError:
                 # logger.warning(f"Cannot use MIT backend, roll back to open")
                 logger.warning(f"Use the open backend")
-                provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q/open/main")
+                provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q/open/main")
         elif hub == "mit":
-            provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q-research/MIT-1/main")
+            provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q-research/MIT-1/main")
         else:
-            provider = QiskitRuntimeService(channel = "ibm_quantum", instance = "ibm-q/open/main")
+            provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = "ibm-q/open/main")
 
     return provider
 
 
 def get_provider_hub_group_project(hub="ibm-q", group="open", project="main"):
-    provider = QiskitRuntimeService(channel = "ibm_quantum", instance = f"{hub}/{group}/{project}")
+    # Get token from GitHub Actions environment.
+    token = os.getenv("IBM_API_TOKEN")
+    provider = QiskitRuntimeService(channel = "ibm_quantum", token=token, instance = f"{hub}/{group}/{project}")
     return provider
 
 
