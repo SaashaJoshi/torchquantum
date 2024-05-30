@@ -196,6 +196,7 @@ class QiskitProcessor(object):
             token = os.getenv("IBM_API_TOKEN")
             # IBMQ.load_account()
             self.provider = get_provider_hub_group_project(
+                token=token,
                 hub=self.hub,
                 group=self.group,
                 project=self.project,
